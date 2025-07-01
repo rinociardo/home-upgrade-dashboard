@@ -8,8 +8,14 @@
 </head>
 <body>
   <header>
-    <h1>🏡 Home Upgrade Simulator Dashboard v1.2</h1>
-    <p>Evaluate savings, debt, and lifestyle projections—instantly.</p>
+    <h1>🏡 Home Upgrade Simulator</h1>
+    <p class="subtitle">Evaluate savings, debt, and lifestyle projections—instantly.</p>
+    <div class="project-summary">
+      <em>
+        This is a static web app for evaluating home equity, mortgage options, and lifestyle sustainability.
+        Users can input their financial details and see projections of costs and savings over time, including visualizations of possible future scenarios.
+      </em>
+    </div>
   </header>
 
   <main class="grid-dashboard">
@@ -52,6 +58,8 @@
 
       <label>Annual Lifestyle Expenses (€): <input type="number" id="lifestyleExpenses" value="60000"></label>
       <label>Expected Annual Inflation (%): <input type="number" id="inflationRate" value="2.5" step="0.1"></label>
+      <label>Annual Income (€): <input type="number" id="annualIncome" value="0"></label>
+      <label>Annual Income COLA (%): <input type="number" id="incomeCOLA" value="0" step="0.1"></label>
 
       <button onclick="calculate()">🔍 Evaluate</button>
     </section>

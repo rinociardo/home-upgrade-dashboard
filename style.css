@@ -105,3 +105,11 @@ button {
 button:hover {
   background-color: #025ea1;
 }
+
+/* Add to style.css */
+.project-summary {
+  margin-top: 0.5em;
+  color: #444;
+  font-size: 1.05em;
+  max-width: 600px;
+}
