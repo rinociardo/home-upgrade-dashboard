@@ -23,49 +23,45 @@
       <h2>Current Home</h2>
       <label>Home Value (€): <input type="number" id="currentHome" value="300000"></label>
       <label>Mortgage Remaining (€): <input type="number" id="mortgageRemaining" value="200000"></label>
-
       <h2>New Home</h2>
-      <label>Home Price (€): <input type="number" id="newHome" value="680000"></label>
-      <label>Target Down Payment (%): <input type="number" id="downPercent" value="20"></label>
-      <label>New Mortgage Rate (%): <input type="number" id="newRate" value="3.0" step="0.1"></label>
-      <label>Loan Duration (years):
-        <select id="loanTerm">
-          <option value="15">15</option>
-          <option value="20">20</option>
-          <option value="30" selected>30</option>
-        </select>
-      </label>
+      <label>New Home Value (€): <input type="number" id="newHome" value="400000"></label>
+      <label>Down Payment (%): <input type="number" id="downPercent" value="20"></label>
+      <label>Mortgage Rate (%): <input type="number" id="newRate" value="3"></label>
+      <label>Loan Term (years): <input type="number" id="loanTerm" value="25"></label>
     </section>
 
     <section class="panel summary">
       <h2>Summary</h2>
       <p><strong>Equity Used (€):</strong> <span id="equityUsed">—</span></p>
-      <p><strong>Down Payment Required (€):</strong> <span id="requiredDown">—</span></p>
-      <p><strong>Shortfall from Equity (€):</strong> <span id="savingsNeeded">—</span></p>
+      <p><strong>Required Down Payment (€):</strong> <span id="requiredDown">—</span></p>
+      <p><strong>Savings Needed (€):</strong> <span id="savingsNeeded">—</span></p>
       <p><strong>Loan Amount (€):</strong> <span id="loanAmount">—</span></p>
-      <p><strong>Monthly Mortgage Payment (€):</strong> <span id="monthlyPay">—</span></p>
-      <p><strong>Cash Used from Savings (€):</strong> <span id="cashUsed">—</span></p>
+      <p><strong>Monthly Payment (€):</strong> <span id="monthlyPay">—</span></p>
+      <p><strong>Cash Used (€):</strong> <span id="cashUsed">—</span></p>
       <p><strong>Remaining Savings (€):</strong> <span id="remainingSavings">—</span></p>
     </section>
 
     <section class="panel financials">
       <h2>Financials</h2>
       <div class="savings-subpanel">
-        <label>Total Savings (€): <input type="number" id="savingsEUR" value="2086956.52"></label>
-		<label>Total Savings ($): <input type="number" id="savingsUSD" value="2400000"></label>
-		<label>Exchange Rate (1 EUR = ? USD): <input type="number" id="exchangeRate" value="1.15" step="0.01"></label>
+        <label>Total Savings (€): <input type="number" id="savingsEUR" value="100000"></label>
+        <label>Total Savings ($): <input type="number" id="savingsUSD" value="115000"></label>
+        <label>Exchange Rate (1 EUR = ? USD): <input type="number" id="exchangeRate" value="1.15" step="0.01"></label>
       </div>
-
       <label>Annual Lifestyle Expenses (€): <input type="number" id="lifestyleExpenses" value="60000"></label>
       <label>Expected Annual Inflation (%): <input type="number" id="inflationRate" value="2.5" step="0.1"></label>
       <label>Annual Income (€): <input type="number" id="annualIncome" value="0"></label>
       <label>Annual Income COLA (%): <input type="number" id="incomeCOLA" value="0" step="0.1"></label>
-
       <button onclick="calculate()">🔍 Evaluate</button>
     </section>
 
     <section class="panel chart-panel">
       <canvas id="costChart"></canvas>
+    </section>
+
+    <section class="panel scenario-assessment">
+      <h2>Scenario Assessment</h2>
+      <p id="aiAssessment">Assessment will appear here after calculation.</p>
     </section>
   </main>
 

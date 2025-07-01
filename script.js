@@ -41,7 +41,7 @@ function calculate() {
     60,
     1000,
     inflation,
-    incomeCOLA // <-- add this
+    incomeCOLA
   );
 
   // Use 40th, 50th, 60th percentiles and custom labels/colors
@@ -52,6 +52,7 @@ function calculate() {
     ["#f0ad4e", "#0275d8", "#5cb85c"]
   );
   renderChart(percentiles);
+  scenarioAssessment(sims, percentiles);
 }
 
 function runSimulations(initial, annualMortgage, lifestyle, annualIncome, loanYears, totalYears, runs, inflation, incomeCOLA) {
@@ -75,7 +76,7 @@ function runSimulations(initial, annualMortgage, lifestyle, annualIncome, loanYe
 
       path.push(Math.max(balance, 0));
       lifestyleCost *= 1 + inflation;
-      income *= 1 + incomeCOLA; // <-- apply COLA
+      income *= 1 + incomeCOLA;
     }
 
     results.push(path);
@@ -183,7 +184,30 @@ function randomClamped(mean, stddev) {
     value = mean + stddev * z;
   } while (Math.abs(value - mean) > 2 * stddev);
   return value;
-}window.onload = calculate;
+}
+
+function scenarioAssessment(sims, percentiles) {
+  // % of runs where savings never go below zero
+  const successRate = sims.filter(path => path.every(v => v > 0)).length / sims.length;
+
+  let message = "";
+  if (successRate > 0.95) {
+    message = "✅ Your plan is very robust. In almost all scenarios, your savings last for the full period.";
+  } else if (successRate > 0.75) {
+    message = "🟡 Your plan is fairly safe, but there is some risk in adverse markets.";
+  } else {
+    message = "⚠️ Warning: In many scenarios, your savings may run out. Consider adjusting your expenses or increasing your income.";
+  }
+
+  // Show if "Bad-Markets Scenario" hits zero
+  if (percentiles[0].data.some(v => v <= 0)) {
+    message += " In the worst-case scenario, your savings could be depleted before the end of the period.";
+  }
+
+  document.getElementById("aiAssessment").textContent = message;
+}
+
+window.onload = calculate;
 
 // Link savingsEUR and savingsUSD
 const eurInput = document.getElementById("savingsEUR");
