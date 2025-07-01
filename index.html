@@ -24,10 +24,10 @@
       <label>Home Value (€): <input type="number" id="currentHome" value="300000"></label>
       <label>Mortgage Remaining (€): <input type="number" id="mortgageRemaining" value="200000"></label>
       <h2>New Home</h2>
-      <label>New Home Value (€): <input type="number" id="newHome" value="400000"></label>
+      <label>New Home Value (€): <input type="number" id="newHome" value="680000"></label>
       <label>Down Payment (%): <input type="number" id="downPercent" value="20"></label>
       <label>Mortgage Rate (%): <input type="number" id="newRate" value="3"></label>
-      <label>Loan Term (years): <input type="number" id="loanTerm" value="25"></label>
+      <label>Loan Term (years): <input type="number" id="loanTerm" value="30"></label>
     </section>
 
     <section class="panel summary">
@@ -39,29 +39,30 @@
       <p><strong>Monthly Payment (€):</strong> <span id="monthlyPay">—</span></p>
       <p><strong>Cash Used (€):</strong> <span id="cashUsed">—</span></p>
       <p><strong>Remaining Savings (€):</strong> <span id="remainingSavings">—</span></p>
+
+      <!-- Scenario Assessment as a subpanel -->
+      <div class="scenario-assessment">
+        <h3>Scenario Assessment</h3>
+        <p id="aiAssessment">Assessment will appear here after calculation.</p>
+      </div>
     </section>
 
     <section class="panel financials">
       <h2>Financials</h2>
       <div class="savings-subpanel">
-        <label>Total Savings (€): <input type="number" id="savingsEUR" value="100000"></label>
-        <label>Total Savings ($): <input type="number" id="savingsUSD" value="115000"></label>
-        <label>Exchange Rate (1 EUR = ? USD): <input type="number" id="exchangeRate" value="1.15" step="0.01"></label>
+        <label>Total Savings (€): <input type="number" id="savingsEUR" value=""></label>
+        <label>Total Savings ($): <input type="number" id="savingsUSD" value="2400000"></label>
+        <label>Exchange Rate (1 EUR = ? USD): <input type="number" id="exchangeRate" value="1.5" step="0.01"></label>
       </div>
-      <label>Annual Lifestyle Expenses (€): <input type="number" id="lifestyleExpenses" value="60000"></label>
+      <label>Annual Lifestyle Expenses (€): <input type="number" id="lifestyleExpenses" value="80000"></label>
       <label>Expected Annual Inflation (%): <input type="number" id="inflationRate" value="2.5" step="0.1"></label>
       <label>Annual Income (€): <input type="number" id="annualIncome" value="0"></label>
-      <label>Annual Income COLA (%): <input type="number" id="incomeCOLA" value="0" step="0.1"></label>
+      <label>Annual Income COLA (%): <input type="number" id="incomeCOLA" value="2.0" step="0.1"></label>
       <button onclick="calculate()">🔍 Evaluate</button>
     </section>
 
     <section class="panel chart-panel">
       <canvas id="costChart"></canvas>
-    </section>
-
-    <section class="panel scenario-assessment">
-      <h2>Scenario Assessment</h2>
-      <p id="aiAssessment">Assessment will appear here after calculation.</p>
     </section>
   </main>
 
