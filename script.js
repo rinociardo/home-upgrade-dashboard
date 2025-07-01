@@ -8,6 +8,8 @@ function calculate() {
   const availableSavings = +document.getElementById("savingsEUR").value;
   const lifestyleExpenses = +document.getElementById("lifestyleExpenses").value;
   const inflation = +document.getElementById("inflationRate").value / 100;
+  const annualIncome = +document.getElementById("annualIncome").value;
+  const incomeCOLA = +document.getElementById("incomeCOLA").value / 100;
 
   const equity = currentHome - mortgageRemaining;
   const requiredDown = newHome * downPercent;
@@ -34,22 +36,31 @@ function calculate() {
     savingsAfterPurchase,
     monthlyPayment * 12,
     lifestyleExpenses,
+    annualIncome,
     loanTerm,
     60,
     1000,
-    inflation
+    inflation,
+    incomeCOLA // <-- add this
   );
 
-  const percentiles = computePercentiles(sims, [25, 50, 75]);
+  // Use 40th, 50th, 60th percentiles and custom labels/colors
+  const percentiles = computePercentiles(
+    sims,
+    [40, 50, 60],
+    ["Bad-Markets Scenario", "Most Likely Scenario", "Good-Markets Scenario"],
+    ["#f0ad4e", "#0275d8", "#5cb85c"]
+  );
   renderChart(percentiles);
 }
 
-function runSimulations(initial, annualMortgage, lifestyle, loanYears, totalYears, runs, inflation) {
+function runSimulations(initial, annualMortgage, lifestyle, annualIncome, loanYears, totalYears, runs, inflation, incomeCOLA) {
   const results = [];
 
   for (let i = 0; i < runs; i++) {
     let balance = initial;
     let lifestyleCost = lifestyle;
+    let income = annualIncome;
     const path = [];
 
     for (let year = 0; year < totalYears; year++) {
@@ -59,10 +70,12 @@ function runSimulations(initial, annualMortgage, lifestyle, loanYears, totalYear
 
       balance *= 1 + growth;
       if (year < loanYears) balance -= annualMortgage;
-      balance -= lifestyleCost;
+      // Subtract net expenses (lifestyle - income)
+      balance -= Math.max(lifestyleCost - income, 0);
 
       path.push(Math.max(balance, 0));
       lifestyleCost *= 1 + inflation;
+      income *= 1 + incomeCOLA; // <-- apply COLA
     }
 
     results.push(path);
@@ -71,20 +84,21 @@ function runSimulations(initial, annualMortgage, lifestyle, loanYears, totalYear
   return results;
 }
 
-function computePercentiles(sims, percents) {
+function computePercentiles(sims, percents, labels, colors) {
   const years = sims[0].length;
   const sortedPerYear = Array.from({ length: years }, (_, y) =>
     sims.map(run => run[y]).sort((a, b) => a - b)
   );
 
   return percents.map((p, i) => ({
-    label: `${p}th Percentile`,
+    label: labels[i],
     data: sortedPerYear.map(vals => {
       const rank = Math.floor((p / 100) * vals.length);
       return vals[Math.min(rank, vals.length - 1)];
     }),
-    borderColor: ['#f0ad4e', '#0275d8', '#5cb85c'][i],
-    fill: false,
+    borderColor: colors[i],
+    backgroundColor: i === 0 ? 'rgba(2,117,216,0.08)' : undefined, // Only fill for "Worse" (will use fill: +1)
+    fill: i === 0 ? '+1' : false, // Fill between 0 and 1 (Worse and Better)
     tension: 0.25,
     pointRadius: 0
   }));
@@ -97,23 +111,31 @@ function renderChart(datasets) {
   window.chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: datasets[0].data.map((_, i) => `Year ${i + 1}`),
+      labels: datasets[0].data.map((_, i) => (i + 1) % 5 === 0 ? String(i + 1).padStart(2, '0') : ''),
       datasets
     },
     options: {
       responsive: true,
       plugins: {
+        title: {
+          display: true,
+          text: 'Projected Savings Over Time',
+          font: { size: 20 }
+        },
         legend: {
+          display: true,
           position: 'top',
-          labels: { usePointStyle: true, padding: 12 },
-          title: {
-            display: true,
-            text: 'Projected Savings Trajectories'
+          labels: {
+            font: { size: 14 }
           }
         },
         tooltip: {
-          mode: 'index',
-          intersect: false
+          enabled: true,
+          callbacks: {
+            label: function(context) {
+              return `€${(context.parsed.y / 1e6).toFixed(2)}M`;
+            }
+          }
         }
       },
       interaction: {
@@ -121,12 +143,32 @@ function renderChart(datasets) {
         intersect: false
       },
       scales: {
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: 'Savings' }
-        },
         x: {
-          title: { display: true, text: 'Years Into the Future' }
+          title: {
+            display: true,
+            text: 'Year',
+            font: { size: 16 }
+          },
+          ticks: {
+            font: { size: 13 },
+            callback: function(value, index) {
+              return (index + 1) % 5 === 0 ? String(index + 1).padStart(2, '0') : '';
+            }
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Savings (M€)',
+            font: { size: 16 }
+          },
+          ticks: {
+            font: { size: 13 },
+            callback: function(value) {
+              return (value / 1e6).toFixed(1);
+            }
+          },
+          grid: { color: '#e0e0e0' }
         }
       }
     }
