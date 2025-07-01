@@ -214,21 +214,33 @@ const eurInput = document.getElementById("savingsEUR");
 const usdInput = document.getElementById("savingsUSD");
 const rateInput = document.getElementById("exchangeRate");
 
-eurInput.addEventListener("input", () => {
-  const rate = +rateInput.value;
-  const eur = +eurInput.value;
-  usdInput.value = (eur * rate).toFixed(2);
-});
-
+// USD to EUR
 usdInput.addEventListener("input", () => {
   const rate = +rateInput.value;
   const usd = +usdInput.value;
   eurInput.value = rate ? (usd / rate).toFixed(2) : "";
 });
 
-rateInput.addEventListener("input", () => {
-  eurInput.dispatchEvent(new Event("input"));
+// EUR to USD
+eurInput.addEventListener("input", () => {
+  const rate = +rateInput.value;
+  const eur = +eurInput.value;
+  usdInput.value = (eur * rate).toFixed(2);
 });
 
-// Initial render
-window.onload = calculate;
+// Exchange rate change updates EUR if USD is set, or USD if EUR is set
+rateInput.addEventListener("input", () => {
+  const rate = +rateInput.value;
+  if (usdInput.value) {
+    eurInput.value = rate ? (+usdInput.value / rate).toFixed(2) : "";
+  } else if (eurInput.value) {
+    usdInput.value = (eurInput.value * rate).toFixed(2);
+  }
+});
+
+// On page load, calculate EUR from USD
+window.addEventListener("DOMContentLoaded", () => {
+  const rate = +rateInput.value;
+  const usd = +usdInput.value;
+  eurInput.value = rate ? (usd / rate).toFixed(2) : "";
+});

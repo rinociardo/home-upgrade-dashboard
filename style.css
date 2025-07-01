@@ -134,3 +134,17 @@ button:hover {
   margin: 0.5em 0 0 0;
   line-height: 1.4;
 }
+
+.summary .scenario-assessment {
+  background: #f8f9fa;
+  border-left: 4px solid #0275d8;
+  border-radius: 4px;
+  padding: 0.8em 1em;
+  margin-top: 1em;
+}
+
+.summary .scenario-assessment h3 {
+  margin-top: 0;
+  color: #0275d8;
+  font-size: 1.08em;
+}
