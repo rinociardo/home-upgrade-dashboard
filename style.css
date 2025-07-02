@@ -61,6 +61,11 @@ h2 {
   padding: 0.3rem 0.4rem;
 }
 
+input[type="number"],
+input[type="text"] {
+  text-align: left;
+}
+
 .savings-subpanel {
   margin-bottom: 1rem;
   padding: 0.5rem 0.75rem;
