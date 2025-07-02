@@ -63,8 +63,9 @@ h2 {
 
 input[type="number"],
 input[type="text"] {
-  text-align: right;
+  text-align: right !important;
 }
+
 
 .savings-subpanel {
   margin-bottom: 1rem;
