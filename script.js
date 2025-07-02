@@ -17,9 +17,12 @@ function calculate() {
   const actualDown = Math.min(equity, requiredDown);
   const loanAmount = newHome - actualDown;
 
-  const monthlyRate = newRate / 12;
-  const payments = loanTerm * 12;
-  const monthlyPayment = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -payments));
+  let monthlyPayment = 0;
+  if (loanAmount > 0 && newRate > 0) {
+    const monthlyRate = newRate / 12;
+    const payments = loanTerm * 12;
+    monthlyPayment = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -payments));
+  }
 
   const cashUsed = savingsShortfall;
   const savingsAfterPurchase = availableSavings - cashUsed;
