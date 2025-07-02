@@ -63,7 +63,7 @@ h2 {
 
 input[type="number"],
 input[type="text"] {
-  text-align: left;
+  text-align: right;
 }
 
 .savings-subpanel {
