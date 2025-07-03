@@ -6,32 +6,26 @@ body {
   color: #333;
 }
 
-header {
-  text-align: center;
-  padding: 1.5rem 0 1rem 0;
-  background-color: #0275d8;
-  color: white;
-}
-
-h1 {
-  margin: 0;
-  font-size: 1.8rem;
-}
-
-h2 {
-  margin-top: 1rem;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 0.25rem;
-  color: #333;
-}
-
-.grid-dashboard {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
+.dashboard-layout {
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-  margin: 2rem auto;
+  width: 100%;
   max-width: 1400px;
+  margin: 0 auto;
+}
+
+.top-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.panel.house-panel,
+.panel.summary-panel {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .panel {
@@ -44,7 +38,6 @@ h2 {
   justify-content: flex-start;
 }
 
-/* Uniform input label styling across all panels */
 .panel label {
   display: flex;
   justify-content: space-between;
@@ -66,21 +59,27 @@ input[type="text"] {
   text-align: right !important;
 }
 
-
-.savings-subpanel {
-  margin-bottom: 1rem;
-  padding: 0.5rem 0.75rem;
-  border-left: 4px solid #0275d8;
-  background-color: #f1f8ff;
-  border-radius: 4px;
+.financials-panel {
+  margin-bottom: 0;
 }
 
-/* Chart panel behavior */
-.chart-panel {
+.middle-row {
   display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  width: 100%;
+  min-height: 500px;
+}
+
+.chart-panel {
+  flex: 3 1 0;
+  min-width: 0;
+  min-height: 500px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: center;
-  align-items: center;
-  height: 100%;
 }
 
 .chart-panel canvas {
@@ -89,12 +88,44 @@ input[type="text"] {
   aspect-ratio: 5 / 4;
 }
 
-/* Summary spacing */
-.summary p {
-  display: block;
-  margin-bottom: 0.6rem;
-  font-size: 0.9rem;
-  line-height: 1.2;
+#costChart {
+  width: 100% !important;
+  height: 500px !important;
+  max-width: 100vw;
+}
+
+.scenario-list-panel {
+  flex: 1 1 0;
+  min-width: 180px;
+  max-width: 300px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1em;
+  box-shadow: 0 0 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.scenario-assessment-panel {
+  background: #f8f9fa;
+  border-left: 4px solid #0275d8;
+  border-radius: 4px;
+  padding: 1rem 1.5rem;
+  margin-top: 1.5rem;
+  color: #222;
+  font-size: 1.05em;
+}
+
+.scenario-assessment-panel h2 {
+  margin-top: 0;
+  color: #0275d8;
+  font-size: 1.2em;
+}
+
+.scenario-assessment-panel p {
+  margin: 0.5em 0 0 0;
+  line-height: 1.4;
 }
 
 button {
@@ -110,47 +141,4 @@ button {
 
 button:hover {
   background-color: #025ea1;
-}
-
-/* Add to style.css */
-.project-summary {
-  margin-top: 0.5em;
-  color: #444;
-  font-size: 1.05em;
-  max-width: 600px;
-}
-
-.scenario-assessment {
-  background: #f8f9fa;
-  border-left: 4px solid #0275d8;
-  border-radius: 4px;
-  padding: 1rem 1.5rem;
-  margin-top: 1.5rem;
-  color: #222;
-  font-size: 1.05em;
-}
-
-.scenario-assessment h2 {
-  margin-top: 0;
-  color: #0275d8;
-  font-size: 1.2em;
-}
-
-.scenario-assessment p {
-  margin: 0.5em 0 0 0;
-  line-height: 1.4;
-}
-
-.summary .scenario-assessment {
-  background: #f8f9fa;
-  border-left: 4px solid #0275d8;
-  border-radius: 4px;
-  padding: 0.8em 1em;
-  margin-top: 1em;
-}
-
-.summary .scenario-assessment h3 {
-  margin-top: 0;
-  color: #0275d8;
-  font-size: 1.08em;
 }
