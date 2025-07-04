@@ -2,70 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Home Upgrade Simulator</title>
+  <title>Home Upgrade Dashboard</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header>
-    <h1>🏡 Home Upgrade Simulator</h1>
-    <p class="subtitle">Evaluate savings, debt, and lifestyle projections—instantly.</p>
-    <div class="project-summary">
-      <em>
-        This is a static web app for evaluating home equity, mortgage options, and lifestyle sustainability.
-        Users can input their financial details and see projections of costs and savings over time, including visualizations of possible future scenarios.
-      </em>
+  <main class="dashboard-layout">
+    <!-- Top: House and Summary panels -->
+    <div class="top-row">
+      <section class="panel house-panel">
+        <h2>House</h2>
+        <!-- Add your house-related fields here -->
+        <label>Current Home Value: <input type="number" id="currentHome" value="250000"></label>
+        <label>Mortgage Remaining: <input type="number" id="mortgageRemaining" value="140000"></label>
+        <label>New Home Value: <input type="number" id="newHome" value="680000"></label>
+        <label>Down Payment (%): <input type="number" id="downPercent" value="20"></label>
+        <label>New Mortgage Rate (%): <input type="number" id="newRate" value="3.0" step="0.01"></label>
+        <label>Loan Term (years): <input type="number" id="loanTerm" value="30"></label>
+      </section>
+      <section class="panel summary-panel">
+        <h2>Summary</h2>
+        <p><strong>Equity Used (€):</strong> <span id="equityUsed">—</span></p>
+        <p><strong>Required Down Payment (€):</strong> <span id="requiredDown">—</span></p>
+        <p><strong>Savings Needed (€):</strong> <span id="savingsNeeded">—</span></p>
+        <p><strong>Loan Amount (€):</strong> <span id="loanAmount">—</span></p>
+        <p><strong>Monthly Payment (€):</strong> <span id="monthlyPay">—</span></p>
+        <p><strong>Cash Used (€):</strong> <span id="cashUsed">—</span></p>
+        <p><strong>Remaining Savings (€):</strong> <span id="remainingSavings">—</span></p>
+      </section>
     </div>
-  </header>
 
-  <main class="grid-dashboard">
-    <section class="panel home-inputs">
-      <h2>Current Home</h2>
-      <label>Home Value (€): <input type="number" id="currentHome" value="300000"></label>
-      <label>Mortgage Remaining (€): <input type="number" id="mortgageRemaining" value="200000"></label>
-      <h2>New Home</h2>
-      <label>New Home Value (€): <input type="number" id="newHome" value="680000"></label>
-      <label>Down Payment (%): <input type="number" id="downPercent" value="20"></label>
-      <label>Mortgage Rate (%): <input type="number" id="newRate" value="3"></label>
-      <label>Loan Term (years): <input type="number" id="loanTerm" value="30"></label>
-    </section>
-
-    <section class="panel summary">
-      <h2>Summary</h2>
-      <p><strong>Equity Used (€):</strong> <span id="equityUsed">—</span></p>
-      <p><strong>Required Down Payment (€):</strong> <span id="requiredDown">—</span></p>
-      <p><strong>Savings Needed (€):</strong> <span id="savingsNeeded">—</span></p>
-      <p><strong>Loan Amount (€):</strong> <span id="loanAmount">—</span></p>
-      <p><strong>Monthly Payment (€):</strong> <span id="monthlyPay">—</span></p>
-      <p><strong>Cash Used (€):</strong> <span id="cashUsed">—</span></p>
-      <p><strong>Remaining Savings (€):</strong> <span id="remainingSavings">—</span></p>
-
-      <!-- Scenario Assessment as a subpanel -->
-      <div class="scenario-assessment">
-        <h3>Scenario Assessment</h3>
-        <p id="aiAssessment">Assessment will appear here after calculation.</p>
-      </div>
-    </section>
-
-    <section class="panel financials">
+    <!-- Middle: Financials panel -->
+    <section class="panel financials-panel">
       <h2>Financials</h2>
-      <div class="savings-subpanel">
-        <label>Total Savings (€): <input type="number" id="savingsEUR" value=""></label>
-        <label>Total Savings ($): <input type="number" id="savingsUSD" value="2400000"></label>
-        <label>Exchange Rate (1 EUR = ? USD): <input type="number" id="exchangeRate" value="1.15" step="0.01"></label>
-      </div>
-      <label>Annual Lifestyle Expenses (€): <input type="number" id="lifestyleExpenses" value="80000"></label>
-      <label>Expected Annual Inflation (%): <input type="number" id="inflationRate" value="2.5" step="0.1"></label>
-      <label>Annual Income (€): <input type="number" id="annualIncome" value="0"></label>
+      <label>Available Savings (USD): <input type="number" id="savingsUSD" value="2500000"></label>
+      <label>Exchange Rate (USD/EUR): <input type="number" id="exchangeRate" value="1.15" step="0.01"></label>
+      <label>Available Savings (€): <input type="number" id="savingsEUR"></label>
+      <label>Lifestyle Expenses (€/yr): <input type="number" id="lifestyleExpenses" value="80000"></label>
+      <label>Inflation Rate (%): <input type="number" id="inflationRate" value="2.0" step="0.1"></label>
+      <label>Annual Income (€): <input type="number" id="annualIncome" value="30000"></label>
       <label>Annual Income COLA (%): <input type="number" id="incomeCOLA" value="2.0" step="0.1"></label>
+      <label>Number of Years: <input type="number" id="numYears" value="60" min="1" max="100"></label>
       <button onclick="calculate()">🔍 Evaluate</button>
+      <button id="saveScenarioBtn" type="button">💾 Save Scenario</button>
     </section>
 
-    <section class="panel chart-panel">
-      <canvas id="costChart"></canvas>
+    <!-- Lower Middle: Plot and Scenario List side by side -->
+    <div class="middle-row">
+      <section class="panel chart-panel">
+        <canvas id="costChart"></canvas>
+      </section>
+      <aside class="scenario-list-panel">
+        <h3>Show Scenarios</h3>
+        <div id="scenarioList"></div>
+      </aside>
+    </div>
+
+    <!-- Bottom: Scenario Assessment -->
+    <section class="panel scenario-assessment-panel">
+      <h2>Scenario Assessment</h2>
+      <p id="aiAssessment">Assessment will appear here after calculation.</p>
     </section>
   </main>
 
+  <!-- Modal for scenario naming -->
+  <div id="scenarioModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:2em; border-radius:8px; min-width:300px; max-width:90vw;">
+      <p id="scenarioModalMsg"></p>
+      <input type="text" id="scenarioModalInput" style="width:100%; margin-bottom:1em; display:none;">
+      <div style="text-align:right;">
+        <button id="scenarioModalYes">Yes</button>
+        <button id="scenarioModalNo">No</button>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
-</html>
+</html>gi
