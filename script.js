@@ -57,7 +57,9 @@ function calculate() {
       incomeCOLA,
       marketPaths
     );
-    meanSigmaDatasets = computeMeanAndSigmaBands(
+//    meanSigmaDatasets = computeMeanAndSigmaBands(
+meanSigmaDatasets = computePercentileBands(
+
       sims,
       "Current",
       "#0275d8",
@@ -127,7 +129,7 @@ function runSimulations(initial, annualMortgage, lifestyle, annualIncome, loanYe
       balance *= 1 + growth;
       if (year < loanYears) balance -= annualMortgage;
       balance -= Math.max(lifestyleCost - income, 0);
-      path.push(Math.max(balance, 0));
+      path.push(balance); // ✅ allows negative values
       lifestyleCost *= 1 + inflation;
       income *= 1 + incomeCOLA;
     }
@@ -136,25 +138,30 @@ function runSimulations(initial, annualMortgage, lifestyle, annualIncome, loanYe
   return results;
 }
 
-function computeMeanAndSigmaBands(sims, labelBase = "Current", color="#0275d8", bandColor="rgba(2,117,216,0.15)") {
+
+
+// ==================== Forecasting Logic ====================
+
+function computePercentileBands(sims, labelBase = "Current", color = "#0275d8", bandColor = "rgba(2,117,216,0.15)") {
   const years = sims[0].length;
-  const means = [];
-  const sigmas = [];
-  for (let y = 0; y < years; y++) {
-    const vals = sims.map(run => run[y]);
-    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
-    const variance = vals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / vals.length;
-    const sigma = Math.sqrt(variance);
-    means.push(mean);
-    sigmas.push(sigma);
+  const p10 = [], p50 = [], p90 = [];
+
+  function getPercentile(sortedVals, percentile) {
+    const idx = Math.floor((percentile / 100) * sortedVals.length);
+    return sortedVals[Math.min(idx, sortedVals.length - 1)];
   }
-  // Lower and upper bands
-  const lower = means.map((m, i) => m - sigmas[i]);
-  const upper = means.map((m, i) => m + sigmas[i]);
+
+  for (let y = 0; y < years; y++) {
+    const vals = sims.map(run => run[y]).sort((a, b) => a - b);
+    p10.push(getPercentile(vals, 10));
+    p50.push(getPercentile(vals, 50));
+    p90.push(getPercentile(vals, 90));
+  }
+
   return [
     {
-      label: `Mean - 1σ (${labelBase})`,
-      data: lower,
+      label: `10th Percentile (${labelBase})`,
+      data: p10,
       borderColor: bandColor,
       backgroundColor: bandColor,
       fill: '+1',
@@ -163,8 +170,8 @@ function computeMeanAndSigmaBands(sims, labelBase = "Current", color="#0275d8", 
       tension: 0.25
     },
     {
-      label: `Mean + 1σ (${labelBase})`,
-      data: upper,
+      label: `90th Percentile (${labelBase})`,
+      data: p90,
       borderColor: bandColor,
       backgroundColor: bandColor,
       fill: false,
@@ -173,17 +180,32 @@ function computeMeanAndSigmaBands(sims, labelBase = "Current", color="#0275d8", 
       tension: 0.25
     },
     {
-      label: `Mean (${labelBase})`,
-      data: means,
+      label: `Median (50th Percentile - ${labelBase})`,
+      data: p50,
       borderColor: color,
       backgroundColor: color,
       fill: false,
       pointRadius: 0,
       borderWidth: 2,
       tension: 0.25
+    },
+    {
+      label: "Savings Deficit Zone",
+      data: p10.map(v => (v < 0 ? v : null)),
+      backgroundColor: "rgba(220,53,69,0.1)",
+      borderColor: "rgba(220,53,69,0.3)",
+      fill: true,
+      pointRadius: 0,
+      borderWidth: 1,
+      tension: 0.25
     }
   ];
 }
+
+
+
+
+// ==================== Chart Rendering ====================
 
 function renderChart(datasets) {
   const ctx = document.getElementById('costChart').getContext('2d');
@@ -206,9 +228,7 @@ function renderChart(datasets) {
         legend: {
           display: true,
           position: 'top',
-          labels: {
-            font: { size: 14 }
-          }
+          labels: { font: { size: 14 } }
         },
         tooltip: {
           enabled: true,
@@ -225,11 +245,7 @@ function renderChart(datasets) {
       },
       scales: {
         x: {
-          title: {
-            display: true,
-            text: 'Year',
-            font: { size: 16 }
-          },
+          title: { display: true, text: 'Year', font: { size: 16 } },
           ticks: {
             font: { size: 13 },
             callback: function(value, index) {
@@ -238,23 +254,22 @@ function renderChart(datasets) {
           }
         },
         y: {
-          title: {
-            display: true,
-            text: 'Savings (M€)',
-            font: { size: 16 }
-          },
+          title: { display: true, text: 'Savings (M€)', font: { size: 16 } },
           ticks: {
             font: { size: 13 },
             callback: function(value) {
               return (value / 1e6).toFixed(1);
             }
           },
-          grid: { color: '#e0e0e0' }
+          grid: { color: '#e0e0e0' },
+          beginAtZero: false,
+          suggestedMin: -10000
         }
       }
     }
   });
 }
+
 
 function randomClamped(mean, stddev) {
   let value;
@@ -266,8 +281,8 @@ function randomClamped(mean, stddev) {
   return value;
 }
 
-function scenarioAssessment(sims, meanSigmaDatasets) {
-  // % of runs where savings never go below zero
+
+function scenarioAssessment(sims, percentileDatasets) {
   const successRate = sims.filter(path => path.every(v => v > 0)).length / sims.length;
 
   let message = "";
@@ -279,13 +294,14 @@ function scenarioAssessment(sims, meanSigmaDatasets) {
     message = "⚠️ Warning: In many scenarios, your savings may run out. Consider adjusting your expenses or increasing your income.";
   }
 
-  // Show if "Mean - 1σ" hits zero
-  if (meanSigmaDatasets[0].data.some(v => v <= 0)) {
-    message += " In the lower band (mean - 1σ), your savings could be depleted before the end of the period.";
+  const tenthPercentileCurve = percentileDatasets[0].data;
+  const depletionYear = tenthPercentileCurve.findIndex(v => v <= 0);
+  if (depletionYear >= 0) {
+    message += ` <span style="color: red;">Based on the 10th percentile curve, your savings could be depleted by year ${depletionYear + 1}.</span>`;
   }
-
-  document.getElementById("aiAssessment").textContent = message;
+  document.getElementById("aiAssessment").innerHTML = message;
 }
+
 
 function generateMarketPaths(runs, years) {
   const paths = [];
