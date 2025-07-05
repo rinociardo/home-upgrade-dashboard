@@ -107,6 +107,19 @@ input[type="text"] {
   align-items: flex-start;
 }
 
+/* Styling for each scenario item */
+.scenario-list-panel label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+
+/* Optional spacing for checkbox */
+.scenario-list-panel input[type="checkbox"] {
+  margin-right: 0.5em;
+}
+
+
 .scenario-assessment-panel {
   background: #f8f9fa;
   border-left: 4px solid #0275d8;
