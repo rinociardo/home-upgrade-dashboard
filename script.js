@@ -29,7 +29,6 @@ function calculate() {
 
   document.getElementById("equityUsed").textContent = equityUsed.toLocaleString();
   document.getElementById("dueToSeller").textContent = dueToSeller.toLocaleString();
-
   document.getElementById("downPercent").textContent = downPercent.toLocaleString();
   document.getElementById("loanAmount").textContent = loanAmount.toLocaleString();
   document.getElementById("monthlyPay").textContent = monthlyPayment.toLocaleString();
