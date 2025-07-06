@@ -2,7 +2,7 @@ function calculate() {
   const currentHome = +document.getElementById("currentHome").value;
   const mortgageRemaining = +document.getElementById("mortgageRemaining").value;
   const newHome = +document.getElementById("newHome").value;
-  const downPercent = +document.getElementById("downPercent").value / 100;
+  
   const newRate = +document.getElementById("newRate").value / 100;
   const loanTerm = +document.getElementById("loanTerm").value;
   const availableSavings = +document.getElementById("savingsEUR").value;
@@ -11,11 +11,11 @@ function calculate() {
   const annualIncome = +document.getElementById("annualIncome").value;
   const incomeCOLA = +document.getElementById("incomeCOLA").value / 100;
 
-  const equity = currentHome - mortgageRemaining;
-  const requiredDown = newHome * downPercent;
-  const savingsShortfall = Math.max(requiredDown - equity, 0);
-  const actualDown = Math.min(equity, requiredDown);
-  const loanAmount = newHome - actualDown;
+  const equityUsed = currentHome - mortgageRemaining;
+  const dueToSeller = newHome - currentHome;
+  const downPercent = currentHome / newHome;
+  
+  const loanAmount = newHome * (1 - downPercent);
 
   let monthlyPayment = 0;
   if (loanAmount > 0 && newRate > 0) {
@@ -24,20 +24,21 @@ function calculate() {
     monthlyPayment = (loanAmount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -payments));
   }
 
-  const cashUsed = savingsShortfall;
+  const cashUsed = mortgageRemaining;
   const savingsAfterPurchase = availableSavings - cashUsed;
 
-  document.getElementById("equityUsed").textContent = equity.toLocaleString();
-  document.getElementById("requiredDown").textContent = requiredDown.toLocaleString();
-  document.getElementById("savingsNeeded").textContent = savingsShortfall.toLocaleString();
+  document.getElementById("equityUsed").textContent = equityUsed.toLocaleString();
+  document.getElementById("dueToSeller").textContent = dueToSeller.toLocaleString();
+
+  document.getElementById("downPercent").textContent = downPercent.toLocaleString();
   document.getElementById("loanAmount").textContent = loanAmount.toLocaleString();
-  document.getElementById("monthlyPay").textContent = monthlyPayment.toFixed(2).toLocaleString();
+  document.getElementById("monthlyPay").textContent = monthlyPayment.toLocaleString();
   document.getElementById("cashUsed").textContent = cashUsed.toLocaleString();
   document.getElementById("remainingSavings").textContent = savingsAfterPurchase.toLocaleString();
 
   let allDatasets = [];
 
-  const runs = 1000;
+  const runs = 10000;
   const years = +document.getElementById("numYears").value || 60;
   const marketPaths = generateMarketPaths(runs, years);
 
@@ -116,6 +117,21 @@ meanSigmaDatasets = computePercentileBands(
     document.getElementById("aiAssessment").textContent = "Assessment will appear here after calculation.";
   }
 }
+
+function debounce(fn, delay = 300) {
+  let timeout;
+  return function () {
+    clearTimeout(timeout);
+    timeout = setTimeout(fn, delay);
+  };
+}
+
+
+
+// ==================== Simulation Logic ====================
+
+const debouncedCalculate = debounce(calculate);
+
 
 function runSimulations(initial, annualMortgage, lifestyle, annualIncome, loanYears, totalYears, runs, inflation, incomeCOLA, marketPaths) {
   const results = [];
@@ -470,4 +486,30 @@ function showScenarioModal(existingLabel, scenarioInputs) {
   };
 }
 
-window.onload = calculate();
+window.onload = () => {
+  calculate(); // Initial run
+
+  const inputIds = [
+    "currentHome",
+    "mortgageRemaining",
+    "newHome",
+    "downPercent",
+    "newRate",
+    "loanTerm",
+    "savingsEUR",
+    "lifestyleExpenses",
+    "inflationRate",
+    "annualIncome",
+    "incomeCOLA",
+    "exchangeRate",
+    "savingsUSD",
+    "numYears"
+  ];
+
+  inputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", debouncedCalculate);
+    }
+  });
+};
